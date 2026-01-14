@@ -15,7 +15,7 @@
  */
 
 public void editStrategyButtonClicked(GButton source, GEvent event) { //_CODE_:editStrategyButton:674897:
-  println("editStrategyButton - GButton >> GEvent." + event + " @ " + millis());
+  strategyWindow.setVisible(true);
 } //_CODE_:editStrategyButton:674897:
 
 synchronized public void drawStrategyWindow(PApplet appc, GWinData data) { //_CODE_:strategyWindow:761041:
@@ -23,8 +23,12 @@ synchronized public void drawStrategyWindow(PApplet appc, GWinData data) { //_CO
 } //_CODE_:strategyWindow:761041:
 
 public void addButtonClicked(GButton source, GEvent event) { //_CODE_:addButton:621949:
-  println("addButton - GButton >> GEvent." + event + " @ " + millis());
+  addStrategy.setVisible(true);
 } //_CODE_:addButton:621949:
+
+public void closeStrategyWindowClicked(GButton source, GEvent event) { //_CODE_:closeStrategyWindow:548341:
+  println("closeStrategyWindow - GButton >> GEvent." + event + " @ " + millis());
+} //_CODE_:closeStrategyWindow:548341:
 
 synchronized public void drawAddStrategy(PApplet appc, GWinData data) { //_CODE_:addStrategy:708744:
   appc.background(230);
@@ -38,17 +42,20 @@ public void createGUI(){
   G4P.messagesEnabled(false);
   G4P.setGlobalColorScheme(GCScheme.BLUE_SCHEME);
   G4P.setMouseOverEnabled(false);
-  surface.setTitle("Live Backtestser");
-  editStrategyButton = new GButton(this, 62, 71, 80, 30);
+  surface.setTitle("Live Backtester");
+  editStrategyButton = new GButton(this, 141, 146, 80, 30);
   editStrategyButton.setText("Edit Strategy");
   editStrategyButton.addEventHandler(this, "editStrategyButtonClicked");
-  strategyWindow = GWindow.getWindow(this, "Edit Strategy", 0, 0, 240, 240, JAVA2D);
+  strategyWindow = GWindow.getWindow(this, "Edit Strategy", 140, 100, 300, 300, JAVA2D);
   strategyWindow.noLoop();
   strategyWindow.setActionOnClose(G4P.KEEP_OPEN);
   strategyWindow.addDrawHandler(this, "drawStrategyWindow");
-  addButton = new GButton(strategyWindow, 24, 29, 80, 30);
+  addButton = new GButton(strategyWindow, 9, 88, 80, 30);
   addButton.setText("Add");
   addButton.addEventHandler(this, "addButtonClicked");
+  closeStrategyWindow = new GButton(strategyWindow, 240, 265, 50, 25);
+  closeStrategyWindow.setText("Close");
+  closeStrategyWindow.addEventHandler(this, "closeStrategyWindowClicked");
   addStrategy = GWindow.getWindow(this, "Add Strategy", 0, 0, 150, 150, JAVA2D);
   addStrategy.noLoop();
   addStrategy.setActionOnClose(G4P.KEEP_OPEN);
@@ -62,4 +69,5 @@ public void createGUI(){
 GButton editStrategyButton; 
 GWindow strategyWindow;
 GButton addButton; 
+GButton closeStrategyWindow; 
 GWindow addStrategy;
