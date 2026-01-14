@@ -39,7 +39,7 @@ public void closeStrategyWindowClicked(GButton source, GEvent event) { //_CODE_:
 } //_CODE_:closeStrategyWindow:548341:
 
 public void removeButtonClicked(GButton source, GEvent event) { //_CODE_:removeButton:772442:
-  println("removeButton - GButton >> GEvent." + event + " @ " + millis());
+  removeStrategyWindow.setVisible(true);
 } //_CODE_:removeButton:772442:
 
 public void enableShortClicked(GCheckbox source, GEvent event) { //_CODE_:enableShort:228799:
