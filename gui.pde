@@ -18,6 +18,14 @@ public void editStrategyButtonClicked(GButton source, GEvent event) { //_CODE_:e
   strategyWindow.setVisible(true);
 } //_CODE_:editStrategyButton:674897:
 
+public void saveToFileButtonClicked(GButton source, GEvent event) { //_CODE_:saveToFileButton:917555:
+  println("saveToFileButton - GButton >> GEvent." + event + " @ " + millis());
+} //_CODE_:saveToFileButton:917555:
+
+public void loadFromFileButtonClicked(GButton source, GEvent event) { //_CODE_:loadFromFileButton:656000:
+  println("loadFromFileButton - GButton >> GEvent." + event + " @ " + millis());
+} //_CODE_:loadFromFileButton:656000:
+
 synchronized public void drawStrategyWindow(PApplet appc, GWinData data) { //_CODE_:strategyWindow:761041:
   appc.background(230);
 } //_CODE_:strategyWindow:761041:
@@ -30,9 +38,37 @@ public void closeStrategyWindowClicked(GButton source, GEvent event) { //_CODE_:
   println("closeStrategyWindow - GButton >> GEvent." + event + " @ " + millis());
 } //_CODE_:closeStrategyWindow:548341:
 
+public void removeButtonClicked(GButton source, GEvent event) { //_CODE_:removeButton:772442:
+  println("removeButton - GButton >> GEvent." + event + " @ " + millis());
+} //_CODE_:removeButton:772442:
+
+public void enableShortClicked(GCheckbox source, GEvent event) { //_CODE_:enableShort:228799:
+  println("enableShort - GCheckbox >> GEvent." + event + " @ " + millis());
+} //_CODE_:enableShort:228799:
+
 synchronized public void drawAddStrategy(PApplet appc, GWinData data) { //_CODE_:addStrategy:708744:
   appc.background(230);
 } //_CODE_:addStrategy:708744:
+
+public void strategyListClicked(GDropList source, GEvent event) { //_CODE_:strategyList:709875:
+  println("strategyList - GDropList >> GEvent." + event + " @ " + millis());
+} //_CODE_:strategyList:709875:
+
+public void okButtonAddClicked(GButton source, GEvent event) { //_CODE_:okButtonAdd:997103:
+  println("okButtonAdd - GButton >> GEvent." + event + " @ " + millis());
+} //_CODE_:okButtonAdd:997103:
+
+synchronized public void win_draw1(PApplet appc, GWinData data) { //_CODE_:removeStrategyWindow:863519:
+  appc.background(230);
+} //_CODE_:removeStrategyWindow:863519:
+
+public void textfield1_change1(GTextField source, GEvent event) { //_CODE_:textfield1:264557:
+  println("textfield1 - GTextField >> GEvent." + event + " @ " + millis());
+} //_CODE_:textfield1:264557:
+
+public void okButtonClicked(GButton source, GEvent event) { //_CODE_:okButton:218341:
+  println("okButton - GButton >> GEvent." + event + " @ " + millis());
+} //_CODE_:okButton:218341:
 
 
 
@@ -43,31 +79,100 @@ public void createGUI(){
   G4P.setGlobalColorScheme(GCScheme.BLUE_SCHEME);
   G4P.setMouseOverEnabled(false);
   surface.setTitle("Live Backtester");
-  editStrategyButton = new GButton(this, 141, 146, 80, 30);
+  editStrategyButton = new GButton(this, 10, 10, 120, 35);
   editStrategyButton.setText("Edit Strategy");
   editStrategyButton.addEventHandler(this, "editStrategyButtonClicked");
+  saveToFileButton = new GButton(this, 140, 10, 120, 35);
+  saveToFileButton.setText("Save to File");
+  saveToFileButton.addEventHandler(this, "saveToFileButtonClicked");
+  loadFromFileButton = new GButton(this, 270, 10, 120, 35);
+  loadFromFileButton.setText("Load from File");
+  loadFromFileButton.addEventHandler(this, "loadFromFileButtonClicked");
   strategyWindow = GWindow.getWindow(this, "Edit Strategy", 140, 100, 300, 300, JAVA2D);
   strategyWindow.noLoop();
   strategyWindow.setActionOnClose(G4P.KEEP_OPEN);
   strategyWindow.addDrawHandler(this, "drawStrategyWindow");
-  addButton = new GButton(strategyWindow, 9, 88, 80, 30);
+  addButton = new GButton(strategyWindow, 5, 36, 65, 30);
   addButton.setText("Add");
   addButton.addEventHandler(this, "addButtonClicked");
   closeStrategyWindow = new GButton(strategyWindow, 240, 265, 50, 25);
   closeStrategyWindow.setText("Close");
   closeStrategyWindow.addEventHandler(this, "closeStrategyWindowClicked");
+  strategyWindowTitle = new GLabel(strategyWindow, 0, 1, 96, 30);
+  strategyWindowTitle.setTextAlign(GAlign.CENTER, GAlign.MIDDLE);
+  strategyWindowTitle.setText("My Strategy");
+  strategyWindowTitle.setOpaque(false);
+  strategyText = new GLabel(strategyWindow, 5, 76, 286, 177);
+  strategyText.setTextAlign(GAlign.LEFT, GAlign.TOP);
+  strategyText.setOpaque(false);
+  removeButton = new GButton(strategyWindow, 76, 36, 65, 30);
+  removeButton.setText("Remove");
+  removeButton.addEventHandler(this, "removeButtonClicked");
+  enableShort = new GCheckbox(strategyWindow, 150, 42, 145, 20);
+  enableShort.setIconAlign(GAlign.LEFT, GAlign.MIDDLE);
+  enableShort.setText("Enable Short Selling");
+  enableShort.setOpaque(false);
+  enableShort.addEventHandler(this, "enableShortClicked");
   addStrategy = GWindow.getWindow(this, "Add Strategy", 0, 0, 150, 150, JAVA2D);
   addStrategy.noLoop();
   addStrategy.setActionOnClose(G4P.KEEP_OPEN);
   addStrategy.addDrawHandler(this, "drawAddStrategy");
+  label4 = new GLabel(addStrategy, 4, 4, 80, 20);
+  label4.setTextAlign(GAlign.CENTER, GAlign.MIDDLE);
+  label4.setText("Add Strategy");
+  label4.setOpaque(false);
+  strategyList = new GDropList(addStrategy, 5, 32, 90, 80, 3, 10);
+  strategyList.setItems(loadStrings("list_709875"), 0);
+  strategyList.addEventHandler(this, "strategyListClicked");
+  okButtonAdd = new GButton(addStrategy, 97, 111, 46, 30);
+  okButtonAdd.setText("ok");
+  okButtonAdd.addEventHandler(this, "okButtonAddClicked");
+  removeStrategyWindow = GWindow.getWindow(this, "Remove Strategy", 0, 0, 150, 150, JAVA2D);
+  removeStrategyWindow.noLoop();
+  removeStrategyWindow.setActionOnClose(G4P.KEEP_OPEN);
+  removeStrategyWindow.addDrawHandler(this, "win_draw1");
+  label1 = new GLabel(removeStrategyWindow, 1, 1, 120, 20);
+  label1.setTextAlign(GAlign.CENTER, GAlign.MIDDLE);
+  label1.setText("Remove Strategy");
+  label1.setOpaque(false);
+  label2 = new GLabel(removeStrategyWindow, 0, 32, 144, 30);
+  label2.setTextAlign(GAlign.CENTER, GAlign.MIDDLE);
+  label2.setText("Type which number you want to remove");
+  label2.setOpaque(false);
+  textfield1 = new GTextField(removeStrategyWindow, 2, 66, 103, 30, G4P.SCROLLBARS_NONE);
+  textfield1.setOpaque(true);
+  textfield1.addEventHandler(this, "textfield1_change1");
+  label3 = new GLabel(removeStrategyWindow, 1, 99, 143, 45);
+  label3.setTextAlign(GAlign.CENTER, GAlign.MIDDLE);
+  label3.setText("(eg. 1,3 or type a single number)");
+  label3.setOpaque(false);
+  okButton = new GButton(removeStrategyWindow, 107, 66, 38, 30);
+  okButton.setText("ok");
+  okButton.addEventHandler(this, "okButtonClicked");
   strategyWindow.loop();
   addStrategy.loop();
+  removeStrategyWindow.loop();
 }
 
 // Variable declarations 
 // autogenerated do not edit
 GButton editStrategyButton; 
+GButton saveToFileButton; 
+GButton loadFromFileButton; 
 GWindow strategyWindow;
 GButton addButton; 
 GButton closeStrategyWindow; 
+GLabel strategyWindowTitle; 
+GLabel strategyText; 
+GButton removeButton; 
+GCheckbox enableShort; 
 GWindow addStrategy;
+GLabel label4; 
+GDropList strategyList; 
+GButton okButtonAdd; 
+GWindow removeStrategyWindow;
+GLabel label1; 
+GLabel label2; 
+GTextField textfield1; 
+GLabel label3; 
+GButton okButton; 
