@@ -2,13 +2,13 @@ float getAveragePrice(Candle[] data, String column, int start, int end){
     int loopstart;
     int loopend;
     if (start < 0){
-      loopstart = data.size() - start;
+      loopstart = data.length - start;
     }
     else{
       loopstart = start;
     }
     if (end < 0){
-      loopend = data.size() - end;
+      loopend = data.length - end;
     }
     else{
       loopend = end;
