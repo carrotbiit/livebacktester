@@ -1,4 +1,11 @@
-class MACD{
+class Indicator{
+  int signal(Candle[] data){
+    return 0;
+  }
+}
+
+
+class MACD extends Indicator{
   int shortRange;
   int longRange;
   int lastSignal;
