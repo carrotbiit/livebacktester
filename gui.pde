@@ -35,7 +35,9 @@ public void addButtonClicked(GButton source, GEvent event) { //_CODE_:addButton:
 } //_CODE_:addButton:621949:
 
 public void closeStrategyWindowClicked(GButton source, GEvent event) { //_CODE_:closeStrategyWindow:548341:
-  println("closeStrategyWindow - GButton >> GEvent." + event + " @ " + millis());
+  addStrategy.setVisible(false);
+  removeStrategyWindow.setVisible(false);
+  strategyWindow.setVisible(false);
 } //_CODE_:closeStrategyWindow:548341:
 
 public void removeButtonClicked(GButton source, GEvent event) { //_CODE_:removeButton:772442:
@@ -55,7 +57,7 @@ public void strategyListClicked(GDropList source, GEvent event) { //_CODE_:strat
 } //_CODE_:strategyList:709875:
 
 public void okButtonAddClicked(GButton source, GEvent event) { //_CODE_:okButtonAdd:997103:
-  println("okButtonAdd - GButton >> GEvent." + event + " @ " + millis());
+  addStrategy.setVisible(false);
 } //_CODE_:okButtonAdd:997103:
 
 synchronized public void win_draw1(PApplet appc, GWinData data) { //_CODE_:removeStrategyWindow:863519:
@@ -67,7 +69,7 @@ public void textfield1_change1(GTextField source, GEvent event) { //_CODE_:textf
 } //_CODE_:textfield1:264557:
 
 public void okButtonClicked(GButton source, GEvent event) { //_CODE_:okButton:218341:
-  println("okButton - GButton >> GEvent." + event + " @ " + millis());
+  removeStrategyWindow.setVisible(false);
 } //_CODE_:okButton:218341:
 
 
@@ -88,7 +90,7 @@ public void createGUI(){
   loadFromFileButton = new GButton(this, 270, 10, 120, 35);
   loadFromFileButton.setText("Load from File");
   loadFromFileButton.addEventHandler(this, "loadFromFileButtonClicked");
-  strategyWindow = GWindow.getWindow(this, "Edit Strategy", 140, 100, 300, 300, JAVA2D);
+  strategyWindow = GWindow.getWindow(this, "Edit Strategy", 160, 100, 300, 300, JAVA2D);
   strategyWindow.noLoop();
   strategyWindow.setActionOnClose(G4P.KEEP_OPEN);
   strategyWindow.addDrawHandler(this, "drawStrategyWindow");
@@ -127,7 +129,7 @@ public void createGUI(){
   okButtonAdd = new GButton(addStrategy, 97, 111, 46, 30);
   okButtonAdd.setText("ok");
   okButtonAdd.addEventHandler(this, "okButtonAddClicked");
-  removeStrategyWindow = GWindow.getWindow(this, "Remove Strategy", 0, 0, 150, 150, JAVA2D);
+  removeStrategyWindow = GWindow.getWindow(this, "Remove Strategy", 0, 200, 150, 150, JAVA2D);
   removeStrategyWindow.noLoop();
   removeStrategyWindow.setActionOnClose(G4P.KEEP_OPEN);
   removeStrategyWindow.addDrawHandler(this, "win_draw1");
