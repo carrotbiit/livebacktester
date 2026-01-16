@@ -7,7 +7,6 @@ void setup(){
   strategyWindow.setVisible(false);
   addStrategy.setVisible(false);
   removeStrategyWindow.setVisible(false);
-  
 }
 
 void draw(){
