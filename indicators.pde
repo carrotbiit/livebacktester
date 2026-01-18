@@ -1,4 +1,5 @@
 class Indicator{
+  int lastSignal;
   int signal(Candle[] data){
     return 0;
   }
