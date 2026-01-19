@@ -1,3 +1,13 @@
+float getMax(Candle[] data){
+  float min = data[0].close;
+  for (Candle candle: data){
+    if (candle.close < min){
+      min = candle.close;
+    }
+  }
+  return min;
+}
+
 float getAveragePrice(Candle[] data, String column, int start, int end){
   int loopstart;
   int loopend;

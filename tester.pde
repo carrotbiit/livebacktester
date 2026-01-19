@@ -1,5 +1,7 @@
 class Tester{
   ArrayList<Indicator> indicators;
+  ArrayList<Integer> history;
+  
   Candle[] data;
   String interval;
   int startIndex;
@@ -72,11 +74,15 @@ class Tester{
         }
         
         if (signal > 0){
+          this.history.add(1);
           float price = curData[curIndex].close;
           
           this.sharesOwned = this.cash / price;
           this.cash = 0;
           println("bought " + this.sharesOwned + " shares at a price of " + int(price*this.sharesOwned));
+        }
+        else{
+          this.history.add(0);
         }
       }
       
@@ -93,11 +99,15 @@ class Tester{
         }
         
         if (signal > 0){
+          this.history.add(-1);
           this.cash = this.sharesOwned * curData[curIndex].close;
           
           println("sold " + this.sharesOwned + " shares for total cost " + int(this.cash));
           
           this.sharesOwned = 0;
+        }
+        else{
+          this.history.add(0);
         }
       }
       
