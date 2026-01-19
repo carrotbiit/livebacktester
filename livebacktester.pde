@@ -1,7 +1,7 @@
 import g4p_controls.*;
 
 MACD macd = new MACD(50, 200);
-ArrayList<Indicator> list = new ArrayList<Indicator>();
+ArrayList<Indicator> indicators = new ArrayList<Indicator>();
 
 void setup(){
   size(800, 500);
@@ -13,9 +13,10 @@ void setup(){
   
   Candle[] stockdata = getStockData("AAPL");
   
-  list.add(macd);
+  indicators.add(macd);
+  Tester tester = new Tester(indicators, stockdata);
   
-  println(list.get(0).signal(stockdata));
+  tester.stepAll();
 }
 
 void draw(){

@@ -1,5 +1,4 @@
 class Indicator{
-  int lastSignal;
   int signal(Candle[] data){
     return 0;
   }
@@ -14,7 +13,7 @@ class MACD extends Indicator{
   MACD(int s, int l){
     this.shortRange = s;
     this.longRange = l;
-    this.lastSignal = -2;
+    this.lastSignal = 0;
   }
   
   int signal(Candle[] data){
@@ -36,17 +35,20 @@ class MACD extends Indicator{
         prediction = -1;
       }
       
-      if (lastSignal == -2){
+      //first ever signal
+      if (this.lastSignal == 0){
         lastSignal = prediction;
         return prediction;
       }
+      
       else{
-        if (prediction == -lastSignal){
+        if (prediction * this.lastSignal < 0){ //flip
+          lastSignal = prediction;
+          return prediction * 2;
+        }
+        else{ //no flip
           lastSignal = prediction;
           return prediction;
-        }
-        else{
-          return 0;
         }
       }
     }

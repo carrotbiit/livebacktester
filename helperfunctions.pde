@@ -2,30 +2,31 @@ float getAveragePrice(Candle[] data, String column, int start, int end){
   int loopstart;
   int loopend;
   if (start < 0){
-    loopstart = data.length - start;
+    loopstart = data.length + start;
   }
   else{
     loopstart = start;
   }
   if (end < 0){
-    loopend = data.length - end;
+    loopend = data.length + end;
   }
   else{
     loopend = end;
   }
   
   float total = 0;
+  int count = 0;
   for (int i = loopstart; i < loopend+1; i++){
-    if (column == "open"){
+    if (column.equals("open")){
       total += data[i].open;
     }
-    if (column == "close"){
+    if (column.equals("close")){
       total += data[i].close;
     }
-    
+    count ++;
   }
   
-  return total/(end-start+1);
+  return total/count;
 }
 
 Candle[] getStockData(String symbol){
@@ -49,7 +50,7 @@ Candle[] getStockData(String symbol){
 int getIndexByDate(Candle[] data, String date){
   int index = 0;
   for (Candle candle: data){
-    if (candle.date == date){
+    if (candle.date.equals(date)){
       return index;
     }
     index += 1;
