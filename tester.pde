@@ -9,14 +9,15 @@ class Tester{
   int curIndex;
   float cash;
   float sharesOwned;
+  String tickerSymbol;
   
-  Tester(ArrayList<Indicator> i, Candle[] d, String s, String e, String intvl){
+  Tester(ArrayList<Indicator> i, String t, String s, String e){
     this.indicators = i;
-    this.data = d;
-    this.interval = intvl;
+    this.tickerSymbol = t;
+    this.data = getStockData(this.tickerSymbol);
     
-    this.startIndex = getIndexByDate(d, s);
-    this.endIndex = getIndexByDate(d, e);
+    this.startIndex = getIndexByDate(this.data, s);
+    this.endIndex = getIndexByDate(this.data, e);
     this.curIndex = startIndex;
     
     this.cash = 100000;
@@ -75,11 +76,11 @@ class Tester{
         
         if (signal > 0){
           this.history.add(1);
-          float price = curData[curIndex].close;
+          float price = this.data[curIndex].close;
           
           this.sharesOwned = this.cash / price;
           this.cash = 0;
-          println("bought " + this.sharesOwned + " shares at a price of " + int(price*this.sharesOwned));
+          println("bought " + this.sharesOwned + " shares at a price of " + int(price*sharesOwned));
         }
         else{
           this.history.add(0);
@@ -100,7 +101,7 @@ class Tester{
         
         if (signal > 0){
           this.history.add(-1);
-          this.cash = this.sharesOwned * curData[curIndex].close;
+          this.cash = this.sharesOwned * this.data[curIndex].close;
           
           println("sold " + this.sharesOwned + " shares for total cost " + int(this.cash));
           

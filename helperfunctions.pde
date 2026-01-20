@@ -74,12 +74,19 @@ Candle[] getStockData(String symbol){
 }
 
 int getIndexByDate(Candle[] data, String date){
-  int index = 0;
-  for (Candle candle: data){
-    if (candle.date.equals(date)){
-      return index;
+  int index = -1;
+  for (int i = 0; i < data.length; i++){
+    if (data[i].date.equals(date)){
+      return i;
     }
-    index += 1;
+    if (data[i].date.compareTo(date) < 0) {
+      index = i;
+    }
+
+    // If we pass the target date, stop
+    if (data[i].date.compareTo(date) > 0) {
+      break;
+    }
   }
-  return -1;
+  return index;
 }

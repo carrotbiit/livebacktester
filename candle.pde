@@ -16,7 +16,7 @@ class Candle{
   }
   
   
-  Candle(String d, float o, float c, float h, float l, int v){
+  Candle(String d, float o, float h, float l, float c, int v){
     this.date = d;
     this.open = o;
     this.close = c; 
