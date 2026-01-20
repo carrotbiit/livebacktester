@@ -1,11 +1,17 @@
-float getMax(Candle[] data){
-  float min = data[0].close;
+float getMaxHigh(Candle[] data){
+  float max = data[0].high;
   for (Candle candle: data){
-    if (candle.close < min){
-      min = candle.close;
+    if (candle.high > max){
+      max = candle.high;
     }
   }
-  return min;
+  return max;
+}
+
+float roundAny(float n, int digits){
+  float newn = round(n * pow(10, digits)) / pow(10, digits);
+  return newn;
+  
 }
 
 float getAveragePrice(Candle[] data, String column, int start, int end){

@@ -1,6 +1,6 @@
 class Tester{
   ArrayList<Indicator> indicators;
-  ArrayList<Integer> history;
+  ArrayList<Integer> history = new ArrayList<Integer>();
   
   Candle[] data;
   String interval;

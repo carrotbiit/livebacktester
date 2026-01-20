@@ -1,24 +1,28 @@
 import g4p_controls.*;
 
-MACD macd = new MACD(50, 200);
-ArrayList<Indicator> indicators = new ArrayList<Indicator>();
+TradingGraph graph = new TradingGraph(new Tester(new ArrayList<Indicator>(), new Candle[0]), new PVector(50, 100), new PVector(750, 450));
 
 void setup(){
+  
   size(800, 500);
-  background(0);
+  frameRate(60);
   createGUI();
   strategyWindow.setVisible(false);
   addStrategy.setVisible(false);
   removeStrategyWindow.setVisible(false);
   
-  Candle[] stockdata = getStockData("AAPL");
-  
+  ArrayList<Indicator> indicators = new ArrayList<Indicator>();
+  MACD macd = new MACD(50, 200);
   indicators.add(macd);
-  Tester tester = new Tester(indicators, stockdata);
-  
-  tester.stepAll();
+  Candle[] data = getStockData("AAPL");
+  graph.tester = new Tester(indicators, data);
 }
 
 void draw(){
-
+  background(0);
+  
+  rect(0, 0, 800, 500);
+  
+  graph.drawMe();
+  graph.update();
 }
