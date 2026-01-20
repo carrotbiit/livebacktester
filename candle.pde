@@ -6,6 +6,16 @@ class Candle{
   float low;
   int volume;
   
+  Candle(Candle candle){
+    this.date = candle.date;
+    this.open = candle.open;
+    this.close = candle.close;
+    this.high = candle.high;
+    this.low = candle.low;
+    this.volume = candle.volume;
+  }
+  
+  
   Candle(String d, float o, float c, float h, float l, int v){
     this.date = d;
     this.open = o;

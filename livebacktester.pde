@@ -1,5 +1,7 @@
 import g4p_controls.*;
 
+boolean paused = false;
+
 TradingGraph graph = new TradingGraph(new Tester(new ArrayList<Indicator>(), new Candle[0]), new PVector(50, 100), new PVector(750, 450));
 
 void setup(){
@@ -16,13 +18,14 @@ void setup(){
   indicators.add(macd);
   Candle[] data = getStockData("AAPL");
   graph.tester = new Tester(indicators, data);
+  
+  //graph.tester.stepAll();
 }
 
 void draw(){
   background(0);
   
-  rect(0, 0, 800, 500);
-  
   graph.drawMe();
   graph.update();
+  
 }

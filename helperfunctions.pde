@@ -8,6 +8,16 @@ float getMaxHigh(Candle[] data){
   return max;
 }
 
+float getMinLow(Candle[] data){
+  float min = data[0].low;
+  for (Candle candle: data){
+    if (candle.low < min){
+      min = candle.high;
+    }
+  }
+  return min;
+}
+
 float roundAny(float n, int digits){
   float newn = round(n * pow(10, digits)) / pow(10, digits);
   return newn;

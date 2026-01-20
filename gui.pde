@@ -26,6 +26,17 @@ public void loadFromFileButtonClicked(GButton source, GEvent event) { //_CODE_:l
   println("loadFromFileButton - GButton >> GEvent." + event + " @ " + millis());
 } //_CODE_:loadFromFileButton:656000:
 
+public void pauseButtonClicked(GButton source, GEvent event) { //_CODE_:pauseButton:389241:
+  if (paused){
+    loop();
+  }
+  else{
+    noLoop();
+  }
+  
+  paused = !paused;
+} //_CODE_:pauseButton:389241:
+
 synchronized public void drawStrategyWindow(PApplet appc, GWinData data) { //_CODE_:strategyWindow:761041:
   appc.background(230);
 } //_CODE_:strategyWindow:761041:
@@ -90,6 +101,9 @@ public void createGUI(){
   loadFromFileButton = new GButton(this, 270, 10, 120, 35);
   loadFromFileButton.setText("Load from File");
   loadFromFileButton.addEventHandler(this, "loadFromFileButtonClicked");
+  pauseButton = new GButton(this, 400, 10, 120, 35);
+  pauseButton.setText("Pause/Unpause");
+  pauseButton.addEventHandler(this, "pauseButtonClicked");
   strategyWindow = GWindow.getWindow(this, "Edit Strategy", 160, 100, 300, 300, JAVA2D);
   strategyWindow.noLoop();
   strategyWindow.setActionOnClose(G4P.KEEP_OPEN);
@@ -161,6 +175,7 @@ public void createGUI(){
 GButton editStrategyButton; 
 GButton saveToFileButton; 
 GButton loadFromFileButton; 
+GButton pauseButton; 
 GWindow strategyWindow;
 GButton addButton; 
 GButton closeStrategyWindow; 

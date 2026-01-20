@@ -26,7 +26,7 @@ class TradingGraph{
     line(this.topLeft.x, this.topLeft.y, this.topLeft.x, this.bottomRight.y);
     line(this.topLeft.x, this.bottomRight.y, this.bottomRight.x, this.bottomRight.y);
     
-    if (this.tester.curIndex - this.tester.startIndex != 0){
+    if (this.tester.curIndex - this.tester.startIndex > 1){
       //get candle data fit to graph
       int start = max(0, this.tester.curIndex - maxCandles);
       int len = min(maxCandles, this.tester.curIndex);
@@ -35,7 +35,7 @@ class TradingGraph{
       int[] tradeHistory = new int[len];
       
       for (int i = 0; i < len; i++) {
-        graphData[i] = this.tester.data[start + i];
+        graphData[i] = new Candle(this.tester.data[start + i]);
         tradeHistory[i] = this.tester.history.get(start + i);
       }
       
@@ -56,42 +56,41 @@ class TradingGraph{
       //draw candles
       float candleWidth;
       if (graphData.length > 50){
-        candleWidth = (this.bottomRight.y - this.topLeft.x) / graphData.length;
+        candleWidth = (this.bottomRight.x - this.topLeft.x) / graphData.length;
       }
       else{
-        candleWidth = (this.bottomRight.y - this.topLeft.x) / 50;
+        candleWidth = (this.bottomRight.x - this.topLeft.x) / 50;
       }
       
       for (int i = 0; i < graphData.length; i++){
         
-        float y1 = (graphData[i].close / getMaxHigh(graphData)) * (this.topLeft.y - this.bottomRight.y) + this.bottomRight.y;
-        float y2 = (graphData[i].open / getMaxHigh(graphData)) * (this.topLeft.y - this.bottomRight.y) + this.bottomRight.y;
+        float high = getMaxHigh(graphData);
+        float low = getMinLow(graphData);
         
-        float yHigh = (graphData[i].high / getMaxHigh(graphData)) * (this.topLeft.y - this.bottomRight.y) + this.bottomRight.y;
-        float yLow = (graphData[i].low / getMaxHigh(graphData)) * (this.topLeft.y - this.bottomRight.y) + this.bottomRight.y;
+        float y1 = map(graphData[i].close, low, high, this.bottomRight.y, this.topLeft.y);
+        float y2 = map(graphData[i].open, low, high, this.bottomRight.y, this.topLeft.y);
+        
+        float y = min(y1, y2);
+        float candleHeight = abs(y2-y1);
+        
+        float yHigh = map(graphData[i].high, low, high, this.bottomRight.y, this.topLeft.y);;
+        float yLow = map(graphData[i].low, low, high, this.bottomRight.y, this.topLeft.y);
         
         if (graphData[i].close > graphData[i].open){
           fill(0, 255, 0);
-          noStroke();
-          
-          rect(candleWidth * i, y1, candleWidth * (i+1), y2);
-          println(candleWidth * i + ", " + candleWidth * (i+1) + ", " + (candleWidth * (i+1) - candleWidth * i));
-          
           stroke(0, 255, 0);
-          //line(candleWidth * (i+0.5), y1, candleWidth * (i+0.5), yHigh);
-          //line(candleWidth * (i+0.5), y2, candleWidth * (i+0.5), yLow);
         }
         else {
           fill(255, 0, 0);
-          noStroke();
-          
-          rect(candleWidth * i, y1, candleWidth * (i+1), y2);
-          
           stroke(255, 0, 0);
-          //line(candleWidth * (i+0.5), y1, candleWidth * (i+0.5), yLow);
-          //line(candleWidth * (i+0.5), y2, candleWidth * (i+0.5), yHigh);
         }
         
+        
+        line(this.topLeft.x + candleWidth * (i + 0.5), yHigh, this.topLeft.x + candleWidth * (i + 0.5), y);
+        line(this.topLeft.x + candleWidth * (i + 0.5), y + candleHeight, this.topLeft.x + candleWidth * (i + 0.5), yLow);
+        
+        noStroke();
+        rect(this.topLeft.x + candleWidth * i, y, candleWidth, candleHeight);
         
       }
     }
