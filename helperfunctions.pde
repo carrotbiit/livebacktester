@@ -1,3 +1,13 @@
+float getMaxVolume(Candle[] data){
+  float max = data[0].volume;
+  for (Candle candle: data){
+    if (candle.volume > max){
+      max = candle.volume;
+    }
+  }
+  return max;
+}
+
 float getMaxHigh(Candle[] data){
   float max = data[0].high;
   for (Candle candle: data){

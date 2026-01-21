@@ -24,9 +24,10 @@ class Tester{
     this.sharesOwned = 0;
   }
   
-  Tester(ArrayList<Indicator> i, Candle[] d){
+  Tester(ArrayList<Indicator> i, String t){
+    this.tickerSymbol = t;
     this.indicators = i;
-    this.data = d;
+    this.data = getStockData(this.tickerSymbol);
     this.interval = "daily";
     
     this.startIndex = 0;

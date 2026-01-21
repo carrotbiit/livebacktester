@@ -22,7 +22,16 @@ class TradingGraph{
     //draw stats
     fill(255);
     noStroke();
-    text("Ticker Symbol: " + tester.tickerSymbol, this.topLeft.x + 50, this.topLeft.y + 20);
+    text("Ticker Symbol: " + tester.tickerSymbol, this.topLeft.x + 25, this.topLeft.y + 20);
+    text("Portfolio Value: $" + roundAny(this.tester.cash + this.tester.sharesOwned * this.tester.data[this.tester.curIndex].close, 2), this.topLeft.x + 150, this.topLeft.y + 20);
+    if (this.tester.cash + this.tester.sharesOwned * this.tester.data[this.tester.curIndex].close < 100000){
+      fill(255, 0, 0);
+    }
+    else {
+      fill(0, 255, 0);
+    }
+    text("Percent Return: " + roundAny(((this.tester.cash + this.tester.sharesOwned * this.tester.data[this.tester.curIndex].close) - 100000) / 100000 * 100, 2) + "%", this.topLeft.x + 310, this.topLeft.y + 20); 
+    
     
     //draw x and y axis
     stroke(255);
@@ -63,6 +72,12 @@ class TradingGraph{
       float high = getMaxHigh(graphData);
       float low = getMinLow(graphData);
       
+      float maxVolume = getMaxVolume(graphData);
+      
+      //label volume
+      fill(255);
+      text("Volume (relative)", this.bottomRight.x - 50, this.bottomRight.y - 50);
+      
       fill(255);
       //draw and label x-axis dates
       line(this.topLeft.x, this.bottomRight.y, this.topLeft.x, this.bottomRight.y + 5);
@@ -98,6 +113,12 @@ class TradingGraph{
         
         float yHigh = map(graphData[i].high, low * 0.8, high * 1.2, this.bottomRight.y, this.topLeft.y);;
         float yLow = map(graphData[i].low, low * 0.8, high * 1.2, this.bottomRight.y, this.topLeft.y);
+        
+        float volumeHeight = map(graphData[i].volume, 0, maxVolume * 1.1, 0, 100);
+        
+        noStroke();
+        fill(0, 0, 255);
+        rect(this.topLeft.x + candleWidth * (i + 0.3), this.bottomRight.y, candleWidth * 0.4, -volumeHeight);
         
         if (graphData[i].close >= graphData[i].open){
           fill(0, 255, 0);

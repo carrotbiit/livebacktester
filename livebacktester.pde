@@ -14,10 +14,14 @@ void setup(){
   removeStrategyWindow.setVisible(false);
   
   ArrayList<Indicator> indicators = new ArrayList<Indicator>();
-  MACD macd = new MACD(50, 200);
-  indicators.add(macd);
   
-  Tester tester = new Tester(indicators, "AAPL", "2020-01-01", "2026-01-01");
+  MACD macd = new MACD(50, 200);
+  RSI rsi = new RSI(14, 70, 30);
+  
+  indicators.add(macd);
+  indicators.add(rsi);
+  
+  Tester tester = new Tester(indicators, "AAPL", "2019-01-01", "2026-01-01");
   
   graph = new TradingGraph(tester, new PVector(50, 100), new PVector(750, 450));
 }
