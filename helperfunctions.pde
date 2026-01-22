@@ -1,3 +1,15 @@
+void updateIndicatorList(){
+  String newText = "";
+  
+  int listNum = 1;
+  for (Indicator i:indicators){
+    newText += (listNum + ". " + i.info() + "\n");
+    listNum += 1;
+  }
+  
+  strategyText.setText(newText);
+}
+
 float getMaxVolume(Candle[] data){
   float max = data[0].volume;
   for (Candle candle: data){

@@ -37,12 +37,37 @@ public void pauseButtonClicked(GButton source, GEvent event) { //_CODE_:pauseBut
   paused = !paused;
 } //_CODE_:pauseButton:389241:
 
+public void tickerFieldChanged(GTextField source, GEvent event) { //_CODE_:tickerField:957004:
+  println("tickerField - GTextField >> GEvent." + event + " @ " + millis());
+} //_CODE_:tickerField:957004:
+
+public void startDateFieldChanged(GTextField source, GEvent event) { //_CODE_:startDateField:916137:
+  println("startDateField - GTextField >> GEvent." + event + " @ " + millis());
+} //_CODE_:startDateField:916137:
+
+public void endDateFieldChanged(GTextField source, GEvent event) { //_CODE_:endDateField:865053:
+  println("endDateField - GTextField >> GEvent." + event + " @ " + millis());
+} //_CODE_:endDateField:865053:
+
+public void goButtonClicked(GButton source, GEvent event) { //_CODE_:goButton:294209:
+  String startDate = startDateField.getText();
+  String endDate = endDateField.getText();
+  String tickerSymbol = tickerField.getText();
+  
+  Tester tester = new Tester(indicators, tickerSymbol, startDate, endDate);
+  graph.tester = tester;
+  runningSim = true;
+  openLong = false;
+  openShort = false;
+} //_CODE_:goButton:294209:
+
 synchronized public void drawStrategyWindow(PApplet appc, GWinData data) { //_CODE_:strategyWindow:761041:
   appc.background(230);
 } //_CODE_:strategyWindow:761041:
 
 public void addButtonClicked(GButton source, GEvent event) { //_CODE_:addButton:621949:
   addStrategy.setVisible(true);
+  
 } //_CODE_:addButton:621949:
 
 public void closeStrategyWindowClicked(GButton source, GEvent event) { //_CODE_:closeStrategyWindow:548341:
@@ -56,7 +81,7 @@ public void removeButtonClicked(GButton source, GEvent event) { //_CODE_:removeB
 } //_CODE_:removeButton:772442:
 
 public void enableShortClicked(GCheckbox source, GEvent event) { //_CODE_:enableShort:228799:
-  println("enableShort - GCheckbox >> GEvent." + event + " @ " + millis());
+  enableShortSelling = enableShort.isSelected();
 } //_CODE_:enableShort:228799:
 
 synchronized public void drawAddStrategy(PApplet appc, GWinData data) { //_CODE_:addStrategy:708744:
@@ -68,6 +93,15 @@ public void strategyListClicked(GDropList source, GEvent event) { //_CODE_:strat
 } //_CODE_:strategyList:709875:
 
 public void okButtonAddClicked(GButton source, GEvent event) { //_CODE_:okButtonAdd:997103:
+  String dropOption = strategyList.getSelectedText();
+  
+  if (dropOption.equals("MACD")){
+    MACDWindow.setVisible(true);
+  }
+  else if (dropOption.equals("RSI")){
+    RSIWindow.setVisible(true);
+  }
+  
   addStrategy.setVisible(false);
 } //_CODE_:okButtonAdd:997103:
 
@@ -75,13 +109,120 @@ synchronized public void win_draw1(PApplet appc, GWinData data) { //_CODE_:remov
   appc.background(230);
 } //_CODE_:removeStrategyWindow:863519:
 
-public void textfield1_change1(GTextField source, GEvent event) { //_CODE_:textfield1:264557:
+public void removeTextFieldChanged(GTextField source, GEvent event) { //_CODE_:removeTextField:264557:
   println("textfield1 - GTextField >> GEvent." + event + " @ " + millis());
-} //_CODE_:textfield1:264557:
+} //_CODE_:removeTextField:264557:
 
 public void okButtonClicked(GButton source, GEvent event) { //_CODE_:okButton:218341:
+  String removeIndex = removeTextField.getText();
+  try{
+    int removeIndexInt = Integer.parseInt(removeIndex);
+    if (indicators.size() >= removeIndexInt){
+      indicators.remove(removeIndexInt-1);
+      updateIndicatorList();
+    }
+  }
+  catch (NumberFormatException e){
+    println("invalid");
+  }
   removeStrategyWindow.setVisible(false);
+  removeTextField.setText("");
 } //_CODE_:okButton:218341:
+
+synchronized public void drawMACD(PApplet appc, GWinData data) { //_CODE_:MACDWindow:948439:
+  appc.background(230);
+} //_CODE_:MACDWindow:948439:
+
+public void textfield2_change1(GTextField source, GEvent event) { //_CODE_:shortAverageText:581796:
+  println("shortAverageText - GTextField >> GEvent." + event + " @ " + millis());
+} //_CODE_:shortAverageText:581796:
+
+public void longAverageTextChanged(GTextField source, GEvent event) { //_CODE_:longAverageText:216884:
+  println("longAverageText - GTextField >> GEvent." + event + " @ " + millis());
+} //_CODE_:longAverageText:216884:
+
+public void MACDCloseButtonClicked(GButton source, GEvent event) { //_CODE_:MACDCloseButton:911697:
+  
+  String longAvg = longAverageText.getText();
+  String shortAvg = shortAverageText.getText();
+  
+  boolean isValid = true;
+  
+  try{
+    if (Integer.parseInt(longAvg) <= Integer.parseInt(shortAvg)){
+      isValid = false;
+    }
+  }
+  catch (NumberFormatException e){
+    isValid = false;
+  }
+  
+  if (isValid){
+    indicators.add(new MACD(Integer.parseInt(shortAvg), Integer.parseInt(longAvg)));
+    updateIndicatorList();
+  }
+  longAverageText.setText("200");
+  shortAverageText.setText("50");
+  MACDWindow.setVisible(false);
+} //_CODE_:MACDCloseButton:911697:
+
+public void MACDCancelButtonClicked(GButton source, GEvent event) { //_CODE_:MACDCancelButton:872976:
+  longAverageText.setText("200");
+  shortAverageText.setText("50");
+  MACDWindow.setVisible(false);
+} //_CODE_:MACDCancelButton:872976:
+
+synchronized public void drawRSIwindow(PApplet appc, GWinData data) { //_CODE_:RSIWindow:816829:
+  appc.background(230);
+} //_CODE_:RSIWindow:816829:
+
+public void timePeriodFieldChanged(GTextField source, GEvent event) { //_CODE_:timePeriodField:479113:
+  println("timePeriodField - GTextField >> GEvent." + event + " @ " + millis());
+} //_CODE_:timePeriodField:479113:
+
+public void overTextFieldChanged(GTextField source, GEvent event) { //_CODE_:overTextField:676199:
+  println("overTextField - GTextField >> GEvent." + event + " @ " + millis());
+} //_CODE_:overTextField:676199:
+
+public void underTextFieldChanged(GTextField source, GEvent event) { //_CODE_:underTextField:794880:
+  println("underTextField - GTextField >> GEvent." + event + " @ " + millis());
+} //_CODE_:underTextField:794880:
+
+public void okRSIClicked(GButton source, GEvent event) { //_CODE_:okRSI:903525:
+  String timePeriod = timePeriodField.getText();
+  String over = overTextField.getText();
+  String under = underTextField.getText();
+  
+  boolean isValid = true;
+  
+  int timePeriodInt = 0;
+  float overFloat = 0;
+  float underFloat = 0;
+  try{
+    timePeriodInt = Integer.parseInt(timePeriod);
+    overFloat = Float.parseFloat(over);
+    underFloat = Float.parseFloat(under);
+    if (timePeriodInt <= 0 || overFloat < underFloat || overFloat > 100 || underFloat > 100 || overFloat < 0 || underFloat < 0){
+      isValid = false;
+    }
+  }
+  catch (NumberFormatException e){
+    isValid = false;
+  }
+  
+  if (isValid){
+    indicators.add(new RSI(timePeriodInt, overFloat, underFloat));
+    updateIndicatorList();
+  }
+  timePeriodField.setText("14");
+  overTextField.setText("70");
+  underTextField.setText("30");
+  RSIWindow.setVisible(false);
+} //_CODE_:okRSI:903525:
+
+public void cancelRSIClicked(GButton source, GEvent event) { //_CODE_:cancelRSI:902654:
+  println("cancelRSI - GButton >> GEvent." + event + " @ " + millis());
+} //_CODE_:cancelRSI:902654:
 
 
 
@@ -92,18 +233,48 @@ public void createGUI(){
   G4P.setGlobalColorScheme(GCScheme.BLUE_SCHEME);
   G4P.setMouseOverEnabled(false);
   surface.setTitle("Live Backtester");
-  editStrategyButton = new GButton(this, 10, 10, 120, 35);
+  editStrategyButton = new GButton(this, 10, 10, 100, 35);
   editStrategyButton.setText("Edit Strategy");
   editStrategyButton.addEventHandler(this, "editStrategyButtonClicked");
-  saveToFileButton = new GButton(this, 140, 10, 120, 35);
+  saveToFileButton = new GButton(this, 120, 10, 100, 35);
   saveToFileButton.setText("Save to File");
   saveToFileButton.addEventHandler(this, "saveToFileButtonClicked");
-  loadFromFileButton = new GButton(this, 270, 10, 120, 35);
+  loadFromFileButton = new GButton(this, 230, 10, 100, 35);
   loadFromFileButton.setText("Load from File");
   loadFromFileButton.addEventHandler(this, "loadFromFileButtonClicked");
-  pauseButton = new GButton(this, 400, 10, 120, 35);
+  pauseButton = new GButton(this, 340, 10, 100, 35);
   pauseButton.setText("Pause/Unpause");
   pauseButton.addEventHandler(this, "pauseButtonClicked");
+  label13 = new GLabel(this, 450, 3, 92, 20);
+  label13.setTextAlign(GAlign.CENTER, GAlign.MIDDLE);
+  label13.setText("Ticker Symbol");
+  label13.setLocalColorScheme(GCScheme.GREEN_SCHEME);
+  label13.setOpaque(false);
+  tickerField = new GTextField(this, 450, 26, 93, 22, G4P.SCROLLBARS_NONE);
+  tickerField.setText("AAPL");
+  tickerField.setOpaque(true);
+  tickerField.addEventHandler(this, "tickerFieldChanged");
+  label14 = new GLabel(this, 550, 3, 92, 20);
+  label14.setTextAlign(GAlign.CENTER, GAlign.MIDDLE);
+  label14.setText("Start Date");
+  label14.setLocalColorScheme(GCScheme.GREEN_SCHEME);
+  label14.setOpaque(false);
+  startDateField = new GTextField(this, 550, 26, 93, 22, G4P.SCROLLBARS_NONE);
+  startDateField.setPromptText("YYYY-MM-DD");
+  startDateField.setOpaque(true);
+  startDateField.addEventHandler(this, "startDateFieldChanged");
+  label15 = new GLabel(this, 649, 3, 92, 20);
+  label15.setTextAlign(GAlign.CENTER, GAlign.MIDDLE);
+  label15.setText("End Date");
+  label15.setLocalColorScheme(GCScheme.GREEN_SCHEME);
+  label15.setOpaque(false);
+  endDateField = new GTextField(this, 649, 26, 93, 22, G4P.SCROLLBARS_NONE);
+  endDateField.setPromptText("YYYY-MM-DD");
+  endDateField.setOpaque(true);
+  endDateField.addEventHandler(this, "endDateFieldChanged");
+  goButton = new GButton(this, 747, 10, 42, 35);
+  goButton.setText("Start");
+  goButton.addEventHandler(this, "goButtonClicked");
   strategyWindow = GWindow.getWindow(this, "Edit Strategy", 160, 100, 300, 300, JAVA2D);
   strategyWindow.noLoop();
   strategyWindow.setActionOnClose(G4P.KEEP_OPEN);
@@ -153,21 +324,99 @@ public void createGUI(){
   label1.setOpaque(false);
   label2 = new GLabel(removeStrategyWindow, 0, 32, 144, 30);
   label2.setTextAlign(GAlign.CENTER, GAlign.MIDDLE);
-  label2.setText("Type which number you want to remove");
+  label2.setText("Type which number on list you want to remove");
   label2.setOpaque(false);
-  textfield1 = new GTextField(removeStrategyWindow, 2, 66, 103, 30, G4P.SCROLLBARS_NONE);
-  textfield1.setOpaque(true);
-  textfield1.addEventHandler(this, "textfield1_change1");
-  label3 = new GLabel(removeStrategyWindow, 1, 99, 143, 45);
-  label3.setTextAlign(GAlign.CENTER, GAlign.MIDDLE);
-  label3.setText("(eg. 1,3 or type a single number)");
-  label3.setOpaque(false);
+  removeTextField = new GTextField(removeStrategyWindow, 2, 66, 103, 30, G4P.SCROLLBARS_NONE);
+  removeTextField.setOpaque(true);
+  removeTextField.addEventHandler(this, "removeTextFieldChanged");
   okButton = new GButton(removeStrategyWindow, 107, 66, 38, 30);
   okButton.setText("ok");
   okButton.addEventHandler(this, "okButtonClicked");
+  MACDWindow = GWindow.getWindow(this, "MACD", 0, 0, 150, 150, JAVA2D);
+  MACDWindow.noLoop();
+  MACDWindow.setActionOnClose(G4P.KEEP_OPEN);
+  MACDWindow.addDrawHandler(this, "drawMACD");
+  addMACDLabel = new GLabel(MACDWindow, 5, 5, 80, 20);
+  addMACDLabel.setTextAlign(GAlign.CENTER, GAlign.MIDDLE);
+  addMACDLabel.setText("New MACD");
+  addMACDLabel.setOpaque(false);
+  label5 = new GLabel(MACDWindow, 5, 28, 94, 20);
+  label5.setTextAlign(GAlign.CENTER, GAlign.MIDDLE);
+  label5.setText("Short Average:");
+  label5.setOpaque(false);
+  label6 = new GLabel(MACDWindow, 5, 72, 101, 20);
+  label6.setTextAlign(GAlign.CENTER, GAlign.MIDDLE);
+  label6.setText("Long Average:");
+  label6.setOpaque(false);
+  shortAverageText = new GTextField(MACDWindow, 5, 48, 75, 20, G4P.SCROLLBARS_NONE);
+  shortAverageText.setText("50");
+  shortAverageText.setOpaque(true);
+  shortAverageText.addEventHandler(this, "textfield2_change1");
+  label7 = new GLabel(MACDWindow, 80, 48, 61, 20);
+  label7.setTextAlign(GAlign.CENTER, GAlign.MIDDLE);
+  label7.setText("days");
+  label7.setOpaque(false);
+  longAverageText = new GTextField(MACDWindow, 5, 95, 75, 20, G4P.SCROLLBARS_NONE);
+  longAverageText.setText("200");
+  longAverageText.setOpaque(true);
+  longAverageText.addEventHandler(this, "longAverageTextChanged");
+  label8 = new GLabel(MACDWindow, 80, 95, 61, 20);
+  label8.setTextAlign(GAlign.CENTER, GAlign.MIDDLE);
+  label8.setText("days");
+  label8.setOpaque(false);
+  MACDCloseButton = new GButton(MACDWindow, 112, 124, 34, 22);
+  MACDCloseButton.setText("ok");
+  MACDCloseButton.addEventHandler(this, "MACDCloseButtonClicked");
+  MACDCancelButton = new GButton(MACDWindow, 62, 124, 47, 22);
+  MACDCancelButton.setText("cancel");
+  MACDCancelButton.addEventHandler(this, "MACDCancelButtonClicked");
+  RSIWindow = GWindow.getWindow(this, "RSI", 0, 0, 150, 180, JAVA2D);
+  RSIWindow.noLoop();
+  RSIWindow.setActionOnClose(G4P.KEEP_OPEN);
+  RSIWindow.addDrawHandler(this, "drawRSIwindow");
+  label3 = new GLabel(RSIWindow, 5, 2, 80, 22);
+  label3.setTextAlign(GAlign.CENTER, GAlign.MIDDLE);
+  label3.setText("New RSI");
+  label3.setOpaque(false);
+  label9 = new GLabel(RSIWindow, 5, 24, 80, 20);
+  label9.setTextAlign(GAlign.CENTER, GAlign.MIDDLE);
+  label9.setText("Time Period");
+  label9.setOpaque(false);
+  timePeriodField = new GTextField(RSIWindow, 5, 46, 60, 20, G4P.SCROLLBARS_NONE);
+  timePeriodField.setText("14");
+  timePeriodField.setOpaque(true);
+  timePeriodField.addEventHandler(this, "timePeriodFieldChanged");
+  label10 = new GLabel(RSIWindow, 66, 46, 41, 20);
+  label10.setTextAlign(GAlign.CENTER, GAlign.MIDDLE);
+  label10.setText("days");
+  label10.setOpaque(false);
+  label11 = new GLabel(RSIWindow, 5, 67, 130, 20);
+  label11.setTextAlign(GAlign.CENTER, GAlign.MIDDLE);
+  label11.setText("Overbought Threshold");
+  label11.setOpaque(false);
+  overTextField = new GTextField(RSIWindow, 5, 88, 60, 20, G4P.SCROLLBARS_NONE);
+  overTextField.setText("70");
+  overTextField.setOpaque(true);
+  overTextField.addEventHandler(this, "overTextFieldChanged");
+  label12 = new GLabel(RSIWindow, 5, 108, 141, 20);
+  label12.setTextAlign(GAlign.CENTER, GAlign.MIDDLE);
+  label12.setText("Underbought Threshold");
+  label12.setOpaque(false);
+  underTextField = new GTextField(RSIWindow, 5, 129, 60, 20, G4P.SCROLLBARS_NONE);
+  underTextField.setText("30");
+  underTextField.setOpaque(true);
+  underTextField.addEventHandler(this, "underTextFieldChanged");
+  okRSI = new GButton(RSIWindow, 115, 150, 30, 21);
+  okRSI.setText("ok");
+  okRSI.addEventHandler(this, "okRSIClicked");
+  cancelRSI = new GButton(RSIWindow, 63, 150, 49, 21);
+  cancelRSI.setText("cancel");
+  cancelRSI.addEventHandler(this, "cancelRSIClicked");
   strategyWindow.loop();
   addStrategy.loop();
   removeStrategyWindow.loop();
+  MACDWindow.loop();
+  RSIWindow.loop();
 }
 
 // Variable declarations 
@@ -176,6 +425,13 @@ GButton editStrategyButton;
 GButton saveToFileButton; 
 GButton loadFromFileButton; 
 GButton pauseButton; 
+GLabel label13; 
+GTextField tickerField; 
+GLabel label14; 
+GTextField startDateField; 
+GLabel label15; 
+GTextField endDateField; 
+GButton goButton; 
 GWindow strategyWindow;
 GButton addButton; 
 GButton closeStrategyWindow; 
@@ -190,6 +446,26 @@ GButton okButtonAdd;
 GWindow removeStrategyWindow;
 GLabel label1; 
 GLabel label2; 
-GTextField textfield1; 
-GLabel label3; 
+GTextField removeTextField; 
 GButton okButton; 
+GWindow MACDWindow;
+GLabel addMACDLabel; 
+GLabel label5; 
+GLabel label6; 
+GTextField shortAverageText; 
+GLabel label7; 
+GTextField longAverageText; 
+GLabel label8; 
+GButton MACDCloseButton; 
+GButton MACDCancelButton; 
+GWindow RSIWindow;
+GLabel label3; 
+GLabel label9; 
+GTextField timePeriodField; 
+GLabel label10; 
+GLabel label11; 
+GTextField overTextField; 
+GLabel label12; 
+GTextField underTextField; 
+GButton okRSI; 
+GButton cancelRSI; 

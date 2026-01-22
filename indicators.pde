@@ -2,6 +2,9 @@ class Indicator{
   int signal(Candle[] data){
     return 0;
   }
+  String info(){
+    return "";
+  }
 }
 
 class RSI extends Indicator{
@@ -9,12 +12,17 @@ class RSI extends Indicator{
   int period;
   float overbought;
   float underbought;
+  String type = "RSI";
   
   RSI(int per, float over, float under){
     this.period = per;
     this.overbought = over;
     this.underbought = under;
     this.lastSignal = 0;
+  }
+  
+  String info(){
+    return "RSI " + this.period + " day average, " + this.overbought + " over, " + this.underbought + " under";
   }
   
   int signal(Candle[] data){
@@ -42,7 +50,13 @@ class RSI extends Indicator{
       float averageGain = gains / this.period;
       float averageLoss = losses / this.period;
       
-      float rsi = 100 - 100 / (1 + averageGain / averageLoss);
+      float rsi;
+      if (averageLoss == 0){
+        rsi = 100;
+      }
+      else {
+        rsi = 100 - 100 / (1 + averageGain / averageLoss);
+      }
       
       int prediction = 0;
       
@@ -53,8 +67,9 @@ class RSI extends Indicator{
         prediction = -1;
       }
       
-      //return buy or sell if signal is up and last signal was do nothing
+      //return buy or sell if signal is up or down and last signal was do nothing
       if (this.lastSignal == 0){
+        lastSignal = prediction * 2;
         return prediction * 2;
       }
       else{
@@ -84,6 +99,10 @@ class MACD extends Indicator{
     this.lastSignal = 0;
   }
   
+  String info(){
+    return "MACD " + this.shortRange + " short, " + this.longRange + " long";
+  }
+  
   int signal(Candle[] data){
     
     
@@ -105,8 +124,8 @@ class MACD extends Indicator{
       
       //first ever signal
       if (this.lastSignal == 0){
-        lastSignal = prediction;
-        return prediction;
+        lastSignal = prediction * 2;
+        return prediction * 2;
       }
       
       else{

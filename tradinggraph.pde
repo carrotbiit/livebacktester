@@ -14,6 +14,12 @@ class TradingGraph{
     
   }
   
+  TradingGraph(PVector tL, PVector bR){
+    this.topLeft = tL;
+    this.bottomRight = bR;
+    
+  }
+  
   void update(){
     this.tester.step();
   }
@@ -105,14 +111,14 @@ class TradingGraph{
       
       for (int i = 0; i < graphData.length; i++){
         
-        float y1 = map(graphData[i].close, low * 0.8, high * 1.2, this.bottomRight.y, this.topLeft.y);
-        float y2 = map(graphData[i].open, low * 0.8, high * 1.2, this.bottomRight.y, this.topLeft.y);
+        float y1 = map(graphData[i].close, low * 0.8, high * 1.2, this.bottomRight.y - 50, this.topLeft.y);
+        float y2 = map(graphData[i].open, low * 0.8, high * 1.2, this.bottomRight.y - 50, this.topLeft.y);
         
         float y = min(y1, y2);
         float candleHeight = abs(y2-y1);
         
-        float yHigh = map(graphData[i].high, low * 0.8, high * 1.2, this.bottomRight.y, this.topLeft.y);;
-        float yLow = map(graphData[i].low, low * 0.8, high * 1.2, this.bottomRight.y, this.topLeft.y);
+        float yHigh = map(graphData[i].high, low * 0.8, high * 1.2, this.bottomRight.y - 50, this.topLeft.y);
+        float yLow = map(graphData[i].low, low * 0.8, high * 1.2, this.bottomRight.y - 50, this.topLeft.y);
         
         float volumeHeight = map(graphData[i].volume, 0, maxVolume * 1.1, 0, 100);
         
@@ -148,7 +154,15 @@ class TradingGraph{
         
         //current price line
         if (i == len-1){
-          stroke(255);
+          if (openLong){
+            stroke(0, 255, 165);
+          }
+          else if (openShort){
+            stroke(255, 165, 0);
+          }
+          else{
+            stroke(255);
+          }
           line(this.topLeft.x, y1, this.bottomRight.x, y1);
         }
       }

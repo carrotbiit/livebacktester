@@ -63,6 +63,7 @@ class Tester{
       if (sharesOwned == 0){
         int signal = 0;
         
+        int firstSignal = 0;
         //for each indicator, get the signal
         for (int i = 0; i < this.indicators.size(); i++){
           int prediction = this.indicators.get(i).signal(curData);
@@ -70,17 +71,21 @@ class Tester{
           if (prediction == 2){ //if signal just flipped, buy
             signal += 1;
           }
+          else if (prediction > 0 && this.history.size() == 0){ //For first buy of the simulation, no need to wait for a flip, all indicators just have to be bullish
+            firstSignal += 1;
+          }
           else if (prediction < 0){ //if signal has been on sell or just flipped to sell, do not buy
             signal -= 999;
           }
         }
         
-        if (signal > 0){
+        if (signal > 0 || firstSignal == this.indicators.size()){
           this.history.add(1);
           float price = this.data[curIndex].close;
           
           this.sharesOwned = this.cash / price;
           this.cash = 0;
+          openLong = true;
           println("bought " + this.sharesOwned + " shares at a price of " + int(price*sharesOwned));
         }
         else{
@@ -104,6 +109,7 @@ class Tester{
           this.history.add(-1);
           this.cash = this.sharesOwned * this.data[curIndex].close;
           
+          openLong = false;
           println("sold " + this.sharesOwned + " shares for total cost " + int(this.cash));
           
           this.sharesOwned = 0;
