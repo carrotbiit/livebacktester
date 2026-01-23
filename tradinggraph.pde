@@ -7,6 +7,7 @@ class TradingGraph{
   int minCandles = 50;
   int maxCandles = 200;
   
+  //initialize tester and size constraints
   TradingGraph(Tester t, PVector tL, PVector bR){
     this.tester = t;
     this.topLeft = tL;
@@ -14,18 +15,21 @@ class TradingGraph{
     
   }
   
+  //alternate for initializing only size and setting tester later
   TradingGraph(PVector tL, PVector bR){
     this.topLeft = tL;
     this.bottomRight = bR;
     
   }
   
+  //step tester 1 frame in future
   void update(){
     this.tester.step();
   }
   
+  //draw graph
   void drawMe(){
-    //draw stats
+    //draw stats, stock symbol, portfolio value, percent return
     fill(255);
     noStroke();
     text("Ticker Symbol: " + tester.tickerSymbol, this.topLeft.x + 25, this.topLeft.y + 20);
@@ -44,6 +48,7 @@ class TradingGraph{
     line(this.topLeft.x, this.topLeft.y + (this.bottomRight.y - this.topLeft.y) * 0.1, this.topLeft.x, this.bottomRight.y);
     line(this.topLeft.x, this.bottomRight.y, this.bottomRight.x, this.bottomRight.y);
     
+    //if there is enough data, draw candles on graph
     if (this.tester.curIndex - this.tester.startIndex > 1){
       
       //get candle data fit to graph
@@ -75,9 +80,11 @@ class TradingGraph{
         candleWidth = (this.bottomRight.x - this.topLeft.x) / 50;
       }
       
+      //get highest and lowest price out of all data
       float high = getMaxHigh(graphData);
       float low = getMinLow(graphData);
       
+      //get max volume from all data
       float maxVolume = getMaxVolume(graphData);
       
       //label volume
@@ -105,43 +112,52 @@ class TradingGraph{
       }
       text("Price ($)", this.topLeft.x - 45, this.topLeft.y + 20);
       
+      //change high if high and low are the same, prevents errors when mapping
       if (high == low){
         high += 1;
       }
       
+      //draw candlesticks
       for (int i = 0; i < graphData.length; i++){
         
-        float y1 = map(graphData[i].close, low * 0.8, high * 1.2, this.bottomRight.y - 50, this.topLeft.y);
-        float y2 = map(graphData[i].open, low * 0.8, high * 1.2, this.bottomRight.y - 50, this.topLeft.y);
+        //map body of candle (close and open price) to y of graph
+        float y1 = map(graphData[i].close, low - 1, high + 1, this.bottomRight.y - 50, this.topLeft.y + 50);
+        float y2 = map(graphData[i].open, low - 1, high + 1, this.bottomRight.y - 50, this.topLeft.y + 50);
         
         float y = min(y1, y2);
         float candleHeight = abs(y2-y1);
         
-        float yHigh = map(graphData[i].high, low * 0.8, high * 1.2, this.bottomRight.y - 50, this.topLeft.y);
-        float yLow = map(graphData[i].low, low * 0.8, high * 1.2, this.bottomRight.y - 50, this.topLeft.y);
+        //map candle wicks (high and low price) to y of graph
+        float yHigh = map(graphData[i].high, low - 1, high + 1, this.bottomRight.y - 50, this.topLeft.y + 50);
+        float yLow = map(graphData[i].low, low - 1, high + 1, this.bottomRight.y - 50, this.topLeft.y + 50);
         
-        float volumeHeight = map(graphData[i].volume, 0, maxVolume * 1.1, 0, 100);
+        //map volume level to graph
+        float volumeHeight = map(graphData[i].volume, 0, maxVolume + 1, 0, 100);
         
+        //draw volume bar at bottom of graph
         noStroke();
         fill(0, 0, 255);
         rect(this.topLeft.x + candleWidth * (i + 0.3), this.bottomRight.y, candleWidth * 0.4, -volumeHeight);
         
-        if (graphData[i].close >= graphData[i].open){
+        //check if candle is red or green
+        if (graphData[i].close >= graphData[i].open){ //green candle: close > open
           fill(0, 255, 0);
           stroke(0, 255, 0);
         }
-        else {
+        else { //red candle: close < open
           fill(255, 0, 0);
           stroke(255, 0, 0);
         }
         
+        //draw candle wicks
         line(this.topLeft.x + candleWidth * (i + 0.5), yHigh, this.topLeft.x + candleWidth * (i + 0.5), y);
         line(this.topLeft.x + candleWidth * (i + 0.5), y + candleHeight, this.topLeft.x + candleWidth * (i + 0.5), yLow);
         
+        //draw candle body
         noStroke();
         rect(this.topLeft.x + candleWidth * i, y, candleWidth, candleHeight);
         
-        //draw buy and sell signals
+        //draw buy and sell signals as triangles
         if (tradeHistory[i] == 1){
           fill(0, 255, 165);
           triangle(this.topLeft.x + candleWidth * (i-1), yLow + 30, this.topLeft.x + candleWidth * (i+2), yLow + 30, this.topLeft.x + candleWidth * (i+0.5), yLow + 20); 
@@ -152,13 +168,10 @@ class TradingGraph{
         }
         
         
-        //current price line
+        //current price line, if there is an open trade make it green
         if (i == len-1){
           if (openLong){
             stroke(0, 255, 165);
-          }
-          else if (openShort){
-            stroke(255, 165, 0);
           }
           else{
             stroke(255);

@@ -15,18 +15,12 @@
  */
 
 public void editStrategyButtonClicked(GButton source, GEvent event) { //_CODE_:editStrategyButton:674897:
-  strategyWindow.setVisible(true);
+  strategyWindow.setVisible(true); //opens the trading strategy window when clicked
 } //_CODE_:editStrategyButton:674897:
 
-public void saveToFileButtonClicked(GButton source, GEvent event) { //_CODE_:saveToFileButton:917555:
-  println("saveToFileButton - GButton >> GEvent." + event + " @ " + millis());
-} //_CODE_:saveToFileButton:917555:
-
-public void loadFromFileButtonClicked(GButton source, GEvent event) { //_CODE_:loadFromFileButton:656000:
-  println("loadFromFileButton - GButton >> GEvent." + event + " @ " + millis());
-} //_CODE_:loadFromFileButton:656000:
-
 public void pauseButtonClicked(GButton source, GEvent event) { //_CODE_:pauseButton:389241:
+
+  //pauses and unpauses the program when clicked
   if (paused){
     loop();
   }
@@ -50,46 +44,60 @@ public void endDateFieldChanged(GTextField source, GEvent event) { //_CODE_:endD
 } //_CODE_:endDateField:865053:
 
 public void goButtonClicked(GButton source, GEvent event) { //_CODE_:goButton:294209:
+
+  //get start date, end date, ticker symbol from text fields
   String startDate = startDateField.getText();
   String endDate = endDateField.getText();
   String tickerSymbol = tickerField.getText();
   
+  //check if the trading strategy is valid (not empty)
   if (indicators.size() < 1){
     warning("Need at least 1 indicator in trading strategy");
   }
+  
+  //check if the ticker symbol is in S&P 500
   else if (!checkValidSymbol(tickerSymbol)){
     warning("Ticker symbol not valid (only S&P 500 stocks)");
   }
+  
+  //check if both dates are formatted correctedly and if end date is after start date
   else if (endDate.compareTo(startDate) <= 0 || !isValidDate(startDate) || !isValidDate(endDate)){
     warning("Enter a valid time period");
   }
+  
+  //if everything is valid, run the sim
   else{
     Tester tester = new Tester(indicators, tickerSymbol, startDate, endDate);
     graph.tester = tester;
     runningSim = true;
     openLong = false;
-    openShort = false;
     loop();
   }
 } //_CODE_:goButton:294209:
+
+public void helpButtonClicked(GButton source, GEvent event) { //_CODE_:helpButton:581054:
+  helpWindow.setVisible(true); //open help window when clicked
+} //_CODE_:helpButton:581054:
+
+public void simSpeedSliderChanged(GCustomSlider source, GEvent event) { //_CODE_:simSpeedSlider:540675:
+  frameRate(simSpeedSlider.getValueI()); //set framerate to slider value
+} //_CODE_:simSpeedSlider:540675:
 
 synchronized public void drawStrategyWindow(PApplet appc, GWinData data) { //_CODE_:strategyWindow:761041:
   appc.background(230);
 } //_CODE_:strategyWindow:761041:
 
 public void addButtonClicked(GButton source, GEvent event) { //_CODE_:addButton:621949:
-  addStrategy.setVisible(true);
+  addStrategy.setVisible(true); //open add strategy window when clicked
   
 } //_CODE_:addButton:621949:
 
 public void closeStrategyWindowClicked(GButton source, GEvent event) { //_CODE_:closeStrategyWindow:548341:
-  addStrategy.setVisible(false);
-  removeStrategyWindow.setVisible(false);
-  strategyWindow.setVisible(false);
+  strategyWindow.setVisible(false); //close strategy window when clicked
 } //_CODE_:closeStrategyWindow:548341:
 
 public void removeButtonClicked(GButton source, GEvent event) { //_CODE_:removeButton:772442:
-  removeStrategyWindow.setVisible(true);
+  removeStrategyWindow.setVisible(true); //opens remove strategy window when clicked
 } //_CODE_:removeButton:772442:
 
 synchronized public void drawAddStrategy(PApplet appc, GWinData data) { //_CODE_:addStrategy:708744:
@@ -101,6 +109,8 @@ public void strategyListClicked(GDropList source, GEvent event) { //_CODE_:strat
 } //_CODE_:strategyList:709875:
 
 public void okButtonAddClicked(GButton source, GEvent event) { //_CODE_:okButtonAdd:997103:
+
+  //opens the customization window associated with the strategy in the dropdown list
   String dropOption = strategyList.getSelectedText();
   
   if (dropOption.equals("MACD")){
@@ -125,15 +135,19 @@ public void removeTextFieldChanged(GTextField source, GEvent event) { //_CODE_:r
 } //_CODE_:removeTextField:264557:
 
 public void okButtonClicked(GButton source, GEvent event) { //_CODE_:okButton:218341:
+
+  //ok button in the remove strategy window
   String removeIndex = removeTextField.getText();
+  
+  //checks if the entered text was valid
   try{
-    int removeIndexInt = Integer.parseInt(removeIndex);
-    if (indicators.size() >= removeIndexInt){
+    int removeIndexInt = Integer.parseInt(removeIndex); //checks if the text entered was an integer
+    if (indicators.size() >= removeIndexInt){ //checks if the index is in range
       indicators.remove(removeIndexInt-1);
       updateIndicatorList();
     }
   }
-  catch (NumberFormatException e){
+  catch (NumberFormatException e) { //if invalid, do nothing
     println("invalid");
   }
   removeStrategyWindow.setVisible(false);
@@ -154,20 +168,23 @@ public void longAverageTextChanged(GTextField source, GEvent event) { //_CODE_:l
 
 public void MACDCloseButtonClicked(GButton source, GEvent event) { //_CODE_:MACDCloseButton:911697:
   
+  //get inputted text from text field
   String longAvg = longAverageText.getText();
   String shortAvg = shortAverageText.getText();
   
   boolean isValid = true;
   
+  //check if input is valid
   try{
-    if (Integer.parseInt(longAvg) <= Integer.parseInt(shortAvg)){
+    if (Integer.parseInt(longAvg) <= Integer.parseInt(shortAvg)){ //check if long average is smaller than short average
       isValid = false;
     }
   }
-  catch (NumberFormatException e){
+  catch (NumberFormatException e){ //check if inputs are integers
     isValid = false;
   }
   
+  //if valid input, add to indicators
   if (isValid){
     indicators.add(new MACD(Integer.parseInt(shortAvg), Integer.parseInt(longAvg)));
     updateIndicatorList();
@@ -178,6 +195,8 @@ public void MACDCloseButtonClicked(GButton source, GEvent event) { //_CODE_:MACD
 } //_CODE_:MACDCloseButton:911697:
 
 public void MACDCancelButtonClicked(GButton source, GEvent event) { //_CODE_:MACDCancelButton:872976:
+  
+  //when clicked, close the window and reset the text fields
   longAverageText.setText("200");
   shortAverageText.setText("50");
   MACDWindow.setVisible(false);
@@ -200,6 +219,8 @@ public void underTextFieldChanged(GTextField source, GEvent event) { //_CODE_:un
 } //_CODE_:underTextField:794880:
 
 public void okRSIClicked(GButton source, GEvent event) { //_CODE_:okRSI:903525:
+  
+  //get inputs
   String timePeriod = timePeriodField.getText();
   String over = overTextField.getText();
   String under = underTextField.getText();
@@ -209,10 +230,14 @@ public void okRSIClicked(GButton source, GEvent event) { //_CODE_:okRSI:903525:
   int timePeriodInt = 0;
   float overFloat = 0;
   float underFloat = 0;
+  
+  //check if inputs are numbers
   try{
     timePeriodInt = Integer.parseInt(timePeriod);
     overFloat = Float.parseFloat(over);
     underFloat = Float.parseFloat(under);
+    
+    //check if numbers are in valid range
     if (timePeriodInt <= 0 || overFloat < underFloat || overFloat > 100 || underFloat > 100 || overFloat < 0 || underFloat < 0){
       isValid = false;
     }
@@ -221,6 +246,7 @@ public void okRSIClicked(GButton source, GEvent event) { //_CODE_:okRSI:903525:
     isValid = false;
   }
   
+  //if valid, add to indicators and reset text fields
   if (isValid){
     indicators.add(new RSI(timePeriodInt, overFloat, underFloat));
     updateIndicatorList();
@@ -260,6 +286,8 @@ public void stochoscUnderChanged(GTextField source, GEvent event) { //_CODE_:sto
 } //_CODE_:stochoscUnder:793984:
 
 public void stochoscCloseClicked(GButton source, GEvent event) { //_CODE_:stochoscClose:670116:
+  
+  //get inputs
   String timePeriod = stochoscPeriod.getText();
   String over = stochoscOver.getText();
   String under = stochoscUnder.getText();
@@ -269,10 +297,14 @@ public void stochoscCloseClicked(GButton source, GEvent event) { //_CODE_:stocho
   int timePeriodInt = 0;
   float overFloat = 0;
   float underFloat = 0;
+  
+  //check if inputs are numbers
   try{
     timePeriodInt = Integer.parseInt(timePeriod);
     overFloat = Float.parseFloat(over);
     underFloat = Float.parseFloat(under);
+    
+    //check if inputs are in range
     if (timePeriodInt <= 0 || overFloat < underFloat || overFloat > 100 || underFloat > 100 || overFloat < 0 || underFloat < 0){
       isValid = false;
     }
@@ -281,6 +313,8 @@ public void stochoscCloseClicked(GButton source, GEvent event) { //_CODE_:stocho
     isValid = false;
   }
   
+  
+  //if valid, add to indicators and reset inputs
   if (isValid){
     indicators.add(new STOCHOSC(timePeriodInt, overFloat, underFloat));
     updateIndicatorList();
@@ -290,6 +324,16 @@ public void stochoscCloseClicked(GButton source, GEvent event) { //_CODE_:stocho
   underTextField.setText("20");
   stochoscWindow.setVisible(false);
 } //_CODE_:stochoscClose:670116:
+
+synchronized public void helpdraw(PApplet appc, GWinData data) { //_CODE_:helpWindow:667628:
+  appc.background(230);
+} //_CODE_:helpWindow:667628:
+
+public void helpOkButtonClicked(GButton source, GEvent event) { //_CODE_:helpOkButton:437098:
+
+  //close help window
+  helpWindow.setVisible(false);
+} //_CODE_:helpOkButton:437098:
 
 
 
@@ -303,13 +347,7 @@ public void createGUI(){
   editStrategyButton = new GButton(this, 10, 10, 100, 35);
   editStrategyButton.setText("Edit Strategy");
   editStrategyButton.addEventHandler(this, "editStrategyButtonClicked");
-  saveToFileButton = new GButton(this, 120, 10, 100, 35);
-  saveToFileButton.setText("Save to File");
-  saveToFileButton.addEventHandler(this, "saveToFileButtonClicked");
-  loadFromFileButton = new GButton(this, 230, 10, 100, 35);
-  loadFromFileButton.setText("Load from File");
-  loadFromFileButton.addEventHandler(this, "loadFromFileButtonClicked");
-  pauseButton = new GButton(this, 340, 10, 100, 35);
+  pauseButton = new GButton(this, 120, 10, 100, 35);
   pauseButton.setText("Pause/Unpause");
   pauseButton.addEventHandler(this, "pauseButtonClicked");
   label13 = new GLabel(this, 450, 3, 92, 20);
@@ -342,6 +380,21 @@ public void createGUI(){
   goButton = new GButton(this, 747, 10, 42, 35);
   goButton.setText("Start");
   goButton.addEventHandler(this, "goButtonClicked");
+  helpButton = new GButton(this, 230, 10, 61, 35);
+  helpButton.setText("Help");
+  helpButton.addEventHandler(this, "helpButtonClicked");
+  simSpeedSlider = new GCustomSlider(this, 297, 25, 144, 45, "blue18px");
+  simSpeedSlider.setShowValue(true);
+  simSpeedSlider.setLimits(30, 10, 60);
+  simSpeedSlider.setNumberFormat(G4P.INTEGER, 0);
+  simSpeedSlider.setLocalColorScheme(GCScheme.GREEN_SCHEME);
+  simSpeedSlider.setOpaque(false);
+  simSpeedSlider.addEventHandler(this, "simSpeedSliderChanged");
+  label23 = new GLabel(this, 298, 4, 106, 20);
+  label23.setTextAlign(GAlign.CENTER, GAlign.MIDDLE);
+  label23.setText("Simulation Speed");
+  label23.setLocalColorScheme(GCScheme.GREEN_SCHEME);
+  label23.setOpaque(false);
   strategyWindow = GWindow.getWindow(this, "Edit Strategy", 160, 100, 300, 300, JAVA2D);
   strategyWindow.noLoop();
   strategyWindow.setActionOnClose(G4P.KEEP_OPEN);
@@ -474,7 +527,7 @@ public void createGUI(){
   cancelRSI = new GButton(RSIWindow, 63, 150, 49, 21);
   cancelRSI.setText("cancel");
   cancelRSI.addEventHandler(this, "cancelRSIClicked");
-  warningWindow = GWindow.getWindow(this, "Warning", 600, 400, 150, 150, JAVA2D);
+  warningWindow = GWindow.getWindow(this, "Warning", 300, 200, 150, 150, JAVA2D);
   warningWindow.noLoop();
   warningWindow.setActionOnClose(G4P.KEEP_OPEN);
   warningWindow.addDrawHandler(this, "warning_draw1");
@@ -532,6 +585,17 @@ public void createGUI(){
   stochoscClose = new GButton(stochoscWindow, 116, 154, 30, 22);
   stochoscClose.setText("ok");
   stochoscClose.addEventHandler(this, "stochoscCloseClicked");
+  helpWindow = GWindow.getWindow(this, "Help", 300, 200, 300, 220, JAVA2D);
+  helpWindow.noLoop();
+  helpWindow.setActionOnClose(G4P.KEEP_OPEN);
+  helpWindow.addDrawHandler(this, "helpdraw");
+  label24 = new GLabel(helpWindow, 2, 6, 292, 172);
+  label24.setTextAlign(GAlign.CENTER, GAlign.MIDDLE);
+  label24.setText("Click edit strategy to add or remove indicators. Indicators either signal buy, sell, or do nothing every frame. All indicators must signal buy to buy. Only one indicator must signal sell to sell. After creating a strategy, specify a stock by ticker symbol and a time period. This simulation only supports stocks in the S&P 500. Dates are in the form YYYY-MM-DD. A date that is out of range of the stock history will automatically correct to the closest valid date. Press start to begin trading simulation. Simulator starts with $100,000 cash.");
+  label24.setOpaque(false);
+  helpOkButton = new GButton(helpWindow, 251, 182, 43, 26);
+  helpOkButton.setText("ok");
+  helpOkButton.addEventHandler(this, "helpOkButtonClicked");
   strategyWindow.loop();
   addStrategy.loop();
   removeStrategyWindow.loop();
@@ -539,13 +603,12 @@ public void createGUI(){
   RSIWindow.loop();
   warningWindow.loop();
   stochoscWindow.loop();
+  helpWindow.loop();
 }
 
 // Variable declarations 
 // autogenerated do not edit
 GButton editStrategyButton; 
-GButton saveToFileButton; 
-GButton loadFromFileButton; 
 GButton pauseButton; 
 GLabel label13; 
 GTextField tickerField; 
@@ -554,6 +617,9 @@ GTextField startDateField;
 GLabel label15; 
 GTextField endDateField; 
 GButton goButton; 
+GButton helpButton; 
+GCustomSlider simSpeedSlider; 
+GLabel label23; 
 GWindow strategyWindow;
 GButton addButton; 
 GButton closeStrategyWindow; 
@@ -605,3 +671,6 @@ GLabel label21;
 GTextField stochoscUnder; 
 GLabel label22; 
 GButton stochoscClose; 
+GWindow helpWindow;
+GLabel label24; 
+GButton helpOkButton; 

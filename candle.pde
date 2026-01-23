@@ -6,6 +6,7 @@ class Candle {
   float low;
   int volume;
 
+  //class initializer that allows for copying of candles
   Candle(Candle candle) {
     this.date = candle.date;
     this.open = candle.open;
@@ -15,7 +16,7 @@ class Candle {
     this.volume = candle.volume;
   }
 
-
+  //alternate initializer 
   Candle(String d, float o, float h, float l, float c, int v) {
     this.date = d;
     this.open = o;
@@ -23,10 +24,5 @@ class Candle {
     this.high = h;
     this.low = l;
     this.volume = v;
-  }
-
-
-  void printInfo() {
-    println(this.date + " " + this.open + " " + this.close + " " + this.high + " " + this.low + " " + this.volume);
   }
 }
