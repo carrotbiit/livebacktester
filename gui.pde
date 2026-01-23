@@ -54,11 +54,23 @@ public void goButtonClicked(GButton source, GEvent event) { //_CODE_:goButton:29
   String endDate = endDateField.getText();
   String tickerSymbol = tickerField.getText();
   
-  Tester tester = new Tester(indicators, tickerSymbol, startDate, endDate);
-  graph.tester = tester;
-  runningSim = true;
-  openLong = false;
-  openShort = false;
+  if (indicators.size() < 1){
+    warning("Need at least 1 indicator in trading strategy");
+  }
+  else if (!checkValidSymbol(tickerSymbol)){
+    warning("Ticker symbol not valid (only S&P 500 stocks)");
+  }
+  else if (endDate.compareTo(startDate) <= 0 || !isValidDate(startDate) || !isValidDate(endDate)){
+    warning("Enter a valid time period");
+  }
+  else{
+    Tester tester = new Tester(indicators, tickerSymbol, startDate, endDate);
+    graph.tester = tester;
+    runningSim = true;
+    openLong = false;
+    openShort = false;
+    loop();
+  }
 } //_CODE_:goButton:294209:
 
 synchronized public void drawStrategyWindow(PApplet appc, GWinData data) { //_CODE_:strategyWindow:761041:
@@ -80,10 +92,6 @@ public void removeButtonClicked(GButton source, GEvent event) { //_CODE_:removeB
   removeStrategyWindow.setVisible(true);
 } //_CODE_:removeButton:772442:
 
-public void enableShortClicked(GCheckbox source, GEvent event) { //_CODE_:enableShort:228799:
-  enableShortSelling = enableShort.isSelected();
-} //_CODE_:enableShort:228799:
-
 synchronized public void drawAddStrategy(PApplet appc, GWinData data) { //_CODE_:addStrategy:708744:
   appc.background(230);
 } //_CODE_:addStrategy:708744:
@@ -100,6 +108,9 @@ public void okButtonAddClicked(GButton source, GEvent event) { //_CODE_:okButton
   }
   else if (dropOption.equals("RSI")){
     RSIWindow.setVisible(true);
+  }
+  else if (dropOption.equals("STOCH OSC")){
+    stochoscWindow.setVisible(true);
   }
   
   addStrategy.setVisible(false);
@@ -224,6 +235,62 @@ public void cancelRSIClicked(GButton source, GEvent event) { //_CODE_:cancelRSI:
   println("cancelRSI - GButton >> GEvent." + event + " @ " + millis());
 } //_CODE_:cancelRSI:902654:
 
+synchronized public void warning_draw1(PApplet appc, GWinData data) { //_CODE_:warningWindow:802076:
+  appc.background(230);
+} //_CODE_:warningWindow:802076:
+
+public void okWarningClicked(GButton source, GEvent event) { //_CODE_:okWarning:794722:
+  warningWindow.setVisible(false);
+} //_CODE_:okWarning:794722:
+
+synchronized public void stochoscdraw1(PApplet appc, GWinData data) { //_CODE_:stochoscWindow:766293:
+  appc.background(230);
+} //_CODE_:stochoscWindow:766293:
+
+public void stochoscPeriodChanged(GTextField source, GEvent event) { //_CODE_:stochoscPeriod:373662:
+  println("stochoscPeriod - GTextField >> GEvent." + event + " @ " + millis());
+} //_CODE_:stochoscPeriod:373662:
+
+public void stochoscOverChanged(GTextField source, GEvent event) { //_CODE_:stochoscOver:918657:
+  println("stochoscOver - GTextField >> GEvent." + event + " @ " + millis());
+} //_CODE_:stochoscOver:918657:
+
+public void stochoscUnderChanged(GTextField source, GEvent event) { //_CODE_:stochoscUnder:793984:
+  println("stochoscUnder - GTextField >> GEvent." + event + " @ " + millis());
+} //_CODE_:stochoscUnder:793984:
+
+public void stochoscCloseClicked(GButton source, GEvent event) { //_CODE_:stochoscClose:670116:
+  String timePeriod = stochoscPeriod.getText();
+  String over = stochoscOver.getText();
+  String under = stochoscUnder.getText();
+  
+  boolean isValid = true;
+  
+  int timePeriodInt = 0;
+  float overFloat = 0;
+  float underFloat = 0;
+  try{
+    timePeriodInt = Integer.parseInt(timePeriod);
+    overFloat = Float.parseFloat(over);
+    underFloat = Float.parseFloat(under);
+    if (timePeriodInt <= 0 || overFloat < underFloat || overFloat > 100 || underFloat > 100 || overFloat < 0 || underFloat < 0){
+      isValid = false;
+    }
+  }
+  catch (NumberFormatException e){
+    isValid = false;
+  }
+  
+  if (isValid){
+    indicators.add(new STOCHOSC(timePeriodInt, overFloat, underFloat));
+    updateIndicatorList();
+  }
+  timePeriodField.setText("14");
+  overTextField.setText("80");
+  underTextField.setText("20");
+  stochoscWindow.setVisible(false);
+} //_CODE_:stochoscClose:670116:
+
 
 
 // Create all the GUI controls. 
@@ -295,11 +362,6 @@ public void createGUI(){
   removeButton = new GButton(strategyWindow, 76, 36, 65, 30);
   removeButton.setText("Remove");
   removeButton.addEventHandler(this, "removeButtonClicked");
-  enableShort = new GCheckbox(strategyWindow, 150, 42, 145, 20);
-  enableShort.setIconAlign(GAlign.LEFT, GAlign.MIDDLE);
-  enableShort.setText("Enable Short Selling");
-  enableShort.setOpaque(false);
-  enableShort.addEventHandler(this, "enableShortClicked");
   addStrategy = GWindow.getWindow(this, "Add Strategy", 0, 0, 150, 150, JAVA2D);
   addStrategy.noLoop();
   addStrategy.setActionOnClose(G4P.KEEP_OPEN);
@@ -412,11 +474,71 @@ public void createGUI(){
   cancelRSI = new GButton(RSIWindow, 63, 150, 49, 21);
   cancelRSI.setText("cancel");
   cancelRSI.addEventHandler(this, "cancelRSIClicked");
+  warningWindow = GWindow.getWindow(this, "Warning", 600, 400, 150, 150, JAVA2D);
+  warningWindow.noLoop();
+  warningWindow.setActionOnClose(G4P.KEEP_OPEN);
+  warningWindow.addDrawHandler(this, "warning_draw1");
+  warningLabel = new GLabel(warningWindow, 1, 0, 145, 120);
+  warningLabel.setTextAlign(GAlign.CENTER, GAlign.MIDDLE);
+  warningLabel.setText("My label");
+  warningLabel.setOpaque(false);
+  okWarning = new GButton(warningWindow, 117, 122, 28, 22);
+  okWarning.setText("ok");
+  okWarning.addEventHandler(this, "okWarningClicked");
+  stochoscWindow = GWindow.getWindow(this, "STOCHOSC", 0, 0, 150, 180, JAVA2D);
+  stochoscWindow.noLoop();
+  stochoscWindow.setActionOnClose(G4P.KEEP_OPEN);
+  stochoscWindow.addDrawHandler(this, "stochoscdraw1");
+  label16 = new GLabel(stochoscWindow, 0, 1, 148, 20);
+  label16.setTextAlign(GAlign.CENTER, GAlign.MIDDLE);
+  label16.setText("New Stochastic Oscillator");
+  label16.setOpaque(false);
+  stochoscPeriod = new GTextField(stochoscWindow, 1, 43, 89, 22, G4P.SCROLLBARS_NONE);
+  stochoscPeriod.setText("14");
+  stochoscPeriod.setOpaque(true);
+  stochoscPeriod.addEventHandler(this, "stochoscPeriodChanged");
+  label17 = new GLabel(stochoscWindow, 1, 22, 80, 20);
+  label17.setTextAlign(GAlign.CENTER, GAlign.MIDDLE);
+  label17.setText("Time Period");
+  label17.setOpaque(false);
+  label18 = new GLabel(stochoscWindow, 90, 44, 39, 20);
+  label18.setTextAlign(GAlign.CENTER, GAlign.MIDDLE);
+  label18.setText("days");
+  label18.setOpaque(false);
+  label19 = new GLabel(stochoscWindow, 0, 66, 131, 20);
+  label19.setTextAlign(GAlign.CENTER, GAlign.MIDDLE);
+  label19.setText("Overbought Threshold");
+  label19.setOpaque(false);
+  stochoscOver = new GTextField(stochoscWindow, 1, 87, 89, 22, G4P.SCROLLBARS_NONE);
+  stochoscOver.setText("80");
+  stochoscOver.setOpaque(true);
+  stochoscOver.addEventHandler(this, "stochoscOverChanged");
+  label20 = new GLabel(stochoscWindow, 90, 88, 26, 20);
+  label20.setTextAlign(GAlign.CENTER, GAlign.MIDDLE);
+  label20.setText("%");
+  label20.setOpaque(false);
+  label21 = new GLabel(stochoscWindow, 1, 110, 143, 20);
+  label21.setTextAlign(GAlign.CENTER, GAlign.MIDDLE);
+  label21.setText("Underbought Threshold");
+  label21.setOpaque(false);
+  stochoscUnder = new GTextField(stochoscWindow, 1, 131, 89, 22, G4P.SCROLLBARS_NONE);
+  stochoscUnder.setText("20");
+  stochoscUnder.setOpaque(true);
+  stochoscUnder.addEventHandler(this, "stochoscUnderChanged");
+  label22 = new GLabel(stochoscWindow, 90, 132, 24, 20);
+  label22.setTextAlign(GAlign.CENTER, GAlign.MIDDLE);
+  label22.setText("%");
+  label22.setOpaque(false);
+  stochoscClose = new GButton(stochoscWindow, 116, 154, 30, 22);
+  stochoscClose.setText("ok");
+  stochoscClose.addEventHandler(this, "stochoscCloseClicked");
   strategyWindow.loop();
   addStrategy.loop();
   removeStrategyWindow.loop();
   MACDWindow.loop();
   RSIWindow.loop();
+  warningWindow.loop();
+  stochoscWindow.loop();
 }
 
 // Variable declarations 
@@ -438,7 +560,6 @@ GButton closeStrategyWindow;
 GLabel strategyWindowTitle; 
 GLabel strategyText; 
 GButton removeButton; 
-GCheckbox enableShort; 
 GWindow addStrategy;
 GLabel label4; 
 GDropList strategyList; 
@@ -469,3 +590,18 @@ GLabel label12;
 GTextField underTextField; 
 GButton okRSI; 
 GButton cancelRSI; 
+GWindow warningWindow;
+GLabel warningLabel; 
+GButton okWarning; 
+GWindow stochoscWindow;
+GLabel label16; 
+GTextField stochoscPeriod; 
+GLabel label17; 
+GLabel label18; 
+GLabel label19; 
+GTextField stochoscOver; 
+GLabel label20; 
+GLabel label21; 
+GTextField stochoscUnder; 
+GLabel label22; 
+GButton stochoscClose; 

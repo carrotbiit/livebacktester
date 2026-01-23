@@ -1,104 +1,152 @@
-void updateIndicatorList(){
+boolean checkValidSymbol(String symbol) {
+  File folder = new File(sketchPath("stockdata"));
+  File[] files = folder.listFiles();
+
+  for (int i = 0; i < files.length; i++) {
+    String name = files[i].getName();
+    String newname = name.substring(0, name.indexOf("."));
+    if (symbol.equals(newname)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+boolean isValidDate(String date) {
+  if (date.length() != 10) {
+    return false;
+  }
+
+  int count = 0;
+
+  for (int i = 0; i < date.length(); i++) {
+    if (date.charAt(i) == '-') {
+      count += 1;
+    }
+  }
+
+  if (count != 2) {
+    return false;
+  } else {
+    String month = date.substring(date.indexOf("-") + 1, date.lastIndexOf("-"));
+    String day = date.substring(date.lastIndexOf("-"), date.length());
+    
+    try{
+      if (Integer.parseInt(day) <= 31 && Integer.parseInt(month) <= 12 && Integer.parseInt(day) != 0 && Integer.parseInt(month) != 0) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+    catch (NumberFormatException e){
+      return false;
+    }
+  }
+}
+
+void warning(String text) {
+  warningLabel.setText(text);
+  warningWindow.setVisible(true);
+}
+
+void updateIndicatorList() {
   String newText = "";
-  
+
   int listNum = 1;
-  for (Indicator i:indicators){
+  for (Indicator i : indicators) {
     newText += (listNum + ". " + i.info() + "\n");
     listNum += 1;
   }
-  
+
   strategyText.setText(newText);
 }
 
-float getMaxVolume(Candle[] data){
+float getMaxVolume(Candle[] data) {
   float max = data[0].volume;
-  for (Candle candle: data){
-    if (candle.volume > max){
+  for (Candle candle : data) {
+    if (candle.volume > max) {
       max = candle.volume;
     }
   }
   return max;
 }
 
-float getMaxHigh(Candle[] data){
+float getMaxHigh(Candle[] data) {
   float max = data[0].high;
-  for (Candle candle: data){
-    if (candle.high > max){
+  for (Candle candle : data) {
+    if (candle.high > max) {
       max = candle.high;
     }
   }
   return max;
 }
 
-float getMinLow(Candle[] data){
+float getMinLow(Candle[] data) {
   float min = data[0].low;
-  for (Candle candle: data){
-    if (candle.low < min){
+  for (Candle candle : data) {
+    if (candle.low < min) {
       min = candle.high;
     }
   }
   return min;
 }
 
-float roundAny(float n, int digits){
+float roundAny(float n, int digits) {
   float newn = round(n * pow(10, digits)) / pow(10, digits);
   return newn;
-  
 }
 
-float getAveragePrice(Candle[] data, String column, int start, int end){
+float getAveragePrice(Candle[] data, String column, int start, int end) {
   int loopstart;
   int loopend;
-  if (start < 0){
+  if (start < 0) {
     loopstart = data.length + start;
-  }
-  else{
+  } else {
     loopstart = start;
   }
-  if (end < 0){
+  if (end < 0) {
     loopend = data.length + end;
-  }
-  else{
+  } else {
     loopend = end;
   }
-  
+
   float total = 0;
   int count = 0;
-  for (int i = loopstart; i < loopend+1; i++){
-    if (column.equals("open")){
+  for (int i = loopstart; i < loopend+1; i++) {
+    if (column.equals("open")) {
       total += data[i].open;
     }
-    if (column.equals("close")){
+    if (column.equals("close")) {
       total += data[i].close;
     }
     count ++;
   }
-  
+
   return total/count;
 }
 
-Candle[] getStockData(String symbol){
-  try{
+Candle[] getStockData(String symbol) {
+  try {
     String[] alldata = loadStrings("stockdata/" + symbol + ".txt");
-    
+
     Candle[] formatteddata = new Candle[alldata.length];
-    
-    for(int i = 0; i < alldata.length; i++){
+
+    for (int i = 0; i < alldata.length; i++) {
       String[] tempdata = alldata[i].split(",");
       formatteddata[i] = new Candle(tempdata[0], float(tempdata[1]), float(tempdata[2]), float(tempdata[3]), float(tempdata[4]), int(tempdata[5]));
     }
-    
+
     return formatteddata;
   }
-  catch(NullPointerException e){
+  catch(NullPointerException e) {
     return new Candle[0];
   }
 }
 
-int getIndexByDate(Candle[] data, String date){
+int getIndexByDate(Candle[] data, String date) {
   int index = -1;
-  for (int i = 0; i < data.length; i++){
-    if (data[i].date.equals(date)){
+  for (int i = 0; i < data.length; i++) {
+    if (data[i].date.equals(date)) {
       return i;
     }
     if (data[i].date.compareTo(date) < 0) {
